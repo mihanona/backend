@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <!-- ✅ Latest stable Spring Boot 3.x (April 23, 2026) -->
+        <!-- Bundles: Spring Security 6.x, Flyway 10.x, Thymeleaf 3.1.x -->
+        <version>3.5.14</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.mihanona</groupId>
+    <artifactId>backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Mihanona Backend</name>
+    <description>Mihanona Field Service Management Platform — API</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <!-- ✅ Latest stable MapStruct (1.7.x is still in Beta — don't use it) -->
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <!-- ✅ Latest stable JJWT 0.12.x patch (August 14, 2025) -->
+        <jjwt.version>0.12.7</jjwt.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- ═══════════════════════════════════════
+             SPRING BOOT STARTERS
+             (managed by parent — no version needed)
+             ═══════════════════════════════════════ -->
+
+        <!-- Web: REST controllers, JSON, embedded Tomcat -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Security: authentication, authorization -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- JPA: database access with Hibernate -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Redis: caching + session management -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- Validation: @NotBlank, @Email, @Valid -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Mail: sending verification emails -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- Thymeleaf: HTML email templates -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!--
+            ✅ FIXED: No version specified here — Spring Boot 3.5.x BOM manages
+            the correct thymeleaf-extras-springsecurity6 version (3.1.x),
+            which is fully compatible with Spring Security 6 bundled in Spring Boot 3.x.
+            This was the root cause of the original issue: Spring Boot 4.x uses
+            Spring Security 7, making this artifact incompatible.
+        -->
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+        </dependency>
+
+        <!-- DevTools: auto-restart when you change code -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════
+             DATABASE
+             ═══════════════════════════════════════ -->
+
+        <!-- PostgreSQL JDBC driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+            Flyway Core: runs your SQL migration files.
+            Version is managed by Spring Boot BOM (Flyway 10.x for Spring Boot 3.5.x).
+            No version override needed — the BOM picks the tested-compatible version.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!-- Flyway PostgreSQL support (required separately in Flyway 10+) -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════
+             CODE GENERATION (compile-time tools)
+             ═══════════════════════════════════════ -->
+
+        <!-- Lombok: removes boilerplate (@Getter, @Builder, etc.) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- MapStruct: auto-generates Entity ↔ DTO converters -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════
+             JWT — JSON Web Tokens
+             ═══════════════════════════════════════ -->
+
+        <!-- JWT API: the interfaces you use in code -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+
+        <!-- JWT implementation: only needed at runtime -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- JWT Jackson support: parses JWT with Jackson JSON library -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════
+             TESTING
+             One starter covers everything. That's it.
+             ═══════════════════════════════════════ -->
+
+        <!-- Spring Boot Test: JUnit 5, Mockito, AssertJ, MockMvc -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Spring Security Test: test secured endpoints -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!-- Spring Boot Maven Plugin: packages app as runnable JAR -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Lombok is compile-time only, not needed in final JAR -->
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Compiler Plugin: runs Lombok + MapStruct during compilation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <!--
+                            ✅ FIXED: Lombok version is now explicit using ${lombok.version},
+                            a property exported by Spring Boot's parent BOM.
+                            This prevents silent annotation processor failures.
+                            Lombok MUST stay before MapStruct — order matters.
+                        -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

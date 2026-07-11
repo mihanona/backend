@@ -1,0 +1,51 @@
+services:
+
+  # ─────────────────────────────────────────────────
+  # PostgreSQL 17 — your main database
+  # ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:17-alpine
+    container_name: mihanona_postgres
+    environment:
+      POSTGRES_DB: mihanona_db
+      POSTGRES_USER: mihanona_user
+      POSTGRES_PASSWORD: mihanona_local
+    ports:
+      - "5432:5432"           # your machine:inside container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "mihanona_user", "-d", "mihanona_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────
+  # Redis 7 — caching and session storage
+  # ─────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: mihanona_redis
+    command: redis-server --requirepass redis_local
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_local", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────
+  # MailDev — fake email server for development
+  # Send emails to port 1025
+  # View them in the browser at port 1080
+  # ─────────────────────────────────────────────────
+  maildev:
+    image: maildev/maildev
+    container_name: mihanona_mail
+    ports:
+      - "1080:1080"           # Web UI — open in browser to see emails
+      - "1025:1025"           # SMTP — Spring Boot sends here
+
+volumes:
+  postgres_data:              # Data persists when you stop/restart containers

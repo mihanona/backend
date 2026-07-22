@@ -81,3 +81,12 @@ app:
     secret: mihanona-dev-secret-key-minimum-32-characters-long
     access-token-expiry: 900        # 15 minutes in seconds
     refresh-token-expiry: 604800    # 7 days in seconds
+
+# ─────────────────────────────────────────────
+# LOGGING
+# ─────────────────────────────────────────────
+logging:
+  level:
+    root: WARN
+    com.mihanona.backend: INFO
+    org.flywaydb: INFO

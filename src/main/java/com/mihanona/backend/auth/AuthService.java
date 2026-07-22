@@ -7,6 +7,10 @@ import com.mihanona.backend.auth.dto.UserResponse;
 import com.mihanona.backend.shared.mail.MailService;
 import com.mihanona.backend.shared.security.JwtService;
 import com.mihanona.backend.shared.util.TokenUtil;
+import com.mihanona.backend.subscription.Subscription;
+import com.mihanona.backend.subscription.SubscriptionPlan;
+import com.mihanona.backend.subscription.SubscriptionPlanRepository;
+import com.mihanona.backend.subscription.SubscriptionRepository;
 import com.mihanona.backend.tenant.Tenant;
 import com.mihanona.backend.tenant.TenantRepository;
 import com.mihanona.backend.user.User;
@@ -33,6 +37,8 @@ public class AuthService {
     private final MailService mailService;
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final SubscriptionPlanRepository subscriptionPlanRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     /**
      * Creates a brand-new tenant AND its first user (the owner) together.
@@ -69,6 +75,16 @@ public class AuthService {
         verificationTokenRepository.save(token);
 
         mailService.sendVerificationEmail(user.getEmail(), user.getFullName(), rawToken);
+
+        SubscriptionPlan starterPlan = subscriptionPlanRepository.findByName("Starter")
+                .orElseThrow(() -> new IllegalStateException("Starter plan not found — check seed data"));
+
+        Subscription subscription = new Subscription();
+        subscription.setTenant(tenant);
+        subscription.setPlan(starterPlan);
+        subscription.setStatus("trial");
+        subscription.setEndsAt(Instant.now().plus(14, ChronoUnit.DAYS)); // matches your 14-day trial policy
+        subscriptionRepository.save(subscription);
 
         return user;
     }

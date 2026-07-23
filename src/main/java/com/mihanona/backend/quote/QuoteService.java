@@ -122,4 +122,31 @@ public class QuoteService {
                 .stream().map(QuoteItemResponse::from).toList();
         return QuoteResponse.of(quote, items);
     }
+
+    @Transactional
+    public QuoteResponse updateStatus(UUID id, String newStatus) {
+        Quote quote = quoteRepository.findByIdAndTenantId(id, TenantContext.get())
+                .orElseThrow(() -> new IllegalArgumentException("Quote not found"));
+
+        // A small, explicit map of what's allowed FROM each current status.
+        // This is a real business rule, not just data validation — it belongs
+        // here in the service layer, not left to chance in the frontend.
+        boolean validTransition = switch (quote.getStatus()) {
+            case "draft" -> newStatus.equals("sent");
+            case "sent" -> newStatus.equals("approved") || newStatus.equals("declined");
+            default -> false; // approved/declined are final states — no further changes
+        };
+
+        if (!validTransition) {
+            throw new IllegalArgumentException(
+                    "Cannot change quote status from '" + quote.getStatus() + "' to '" + newStatus + "'");
+        }
+
+        quote.setStatus(newStatus);
+        Quote saved = quoteRepository.save(quote);
+
+        List<QuoteItemResponse> items = quoteItemRepository.findByQuoteId(saved.getId())
+                .stream().map(QuoteItemResponse::from).toList();
+        return QuoteResponse.of(saved, items);
+    }
 }

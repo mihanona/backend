@@ -2,6 +2,7 @@ package com.mihanona.backend.quote;
 
 import com.mihanona.backend.quote.dto.QuoteRequest;
 import com.mihanona.backend.quote.dto.QuoteResponse;
+import com.mihanona.backend.quote.dto.QuoteStatusRequest;
 import com.mihanona.backend.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,12 @@ public class QuoteController {
     @PostMapping
     public ResponseEntity<ApiResponse<QuoteResponse>> create(@Valid @RequestBody QuoteRequest request) {
         return ResponseEntity.ok(ApiResponse.success(service.create(request)));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<QuoteResponse>> updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody QuoteStatusRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(service.updateStatus(id, request.getStatus())));
     }
 }

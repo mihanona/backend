@@ -55,6 +55,8 @@ public class SecurityConfig {
                         // default login page redirect)
                         .anyRequest().authenticated()
                 )
+                .anonymous(anon -> anon.disable())
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint));
 
